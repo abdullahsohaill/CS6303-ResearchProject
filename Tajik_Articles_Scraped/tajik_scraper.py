@@ -142,4 +142,4 @@ def scrape_all_categories(categories, output_file="tajik_articles_scraped.csv", 
 
 # Execute the scraper
 if __name__ == "__main__":
-    scrape_all_categories(categories, output_file="tajik_articles_scraped.csv", article_limit=50)
+    scrape_all_categories(categories, output_file="tajik_articles_scraped.csv", article_limit=150)
