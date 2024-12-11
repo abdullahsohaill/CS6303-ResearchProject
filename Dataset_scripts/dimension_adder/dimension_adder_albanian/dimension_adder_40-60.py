@@ -1,11 +1,11 @@
 from PIL import Image, ImageFilter, ImageColor
 import os
 
-input_folder = "WordCount40-60"
-output_folder = "WordCount40-60_2DimensionsAdded"
+input_folder = "wc_40-60_initial"
+output_folder = "wc_40-60_blur"
 os.makedirs(output_folder, exist_ok=True)
 
-blur_levels = [1.25, 1.75]
+blur_levels = [0.75, 1.5]
 background_colors = {
     "slate_gray": "#708090", 
     "light_yellow": "#FFFACD"
@@ -13,7 +13,7 @@ background_colors = {
 BACKGROUND_THRESHOLD = 240
 
 for filename in os.listdir(input_folder):
-    if "base_18" in filename and "Jameel Noori Nastaleeq" in filename and filename.lower().endswith(('.jpg', '.jpeg')):
+    if "base_18" in filename and filename.lower().endswith(('.jpg', '.jpeg')):
         try:
             image_path = os.path.join(input_folder, filename)
             img = Image.open(image_path)
