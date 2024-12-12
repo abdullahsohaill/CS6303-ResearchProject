@@ -9,7 +9,7 @@ import pandas as pd
 import os
 from io import BytesIO
 from PIL import Image
-from IPython.display import display, Image as IPythonImage
+# from IPython.display import display, Image as IPythonImage
 from dotenv import load_dotenv
 from openai import OpenAI 
 
@@ -20,17 +20,17 @@ load_dotenv()
 API_key = os.getenv('OPENAI_API_KEY')  # Ensure you have a .env file with OPENAI_API_KEY=your_key
 openai.api_key = API_key
 client = OpenAI(api_key=API_key)
+# print(API_key)
 
 # Define the system prompt tailored for Urdu OCR tasks
 system_prompt = """
-As an AI language model specialized in Optical Character Recognition (OCR) for Urdu script, your task is to extract the text from the provided image accurately.
+As an AI language model specialized in Optical Character Recognition (OCR) for English script, your task is to extract the text from the provided image accurately.
 
 You are required to follow the following instructions:
 - Output only the text found in the image.
 - Do not add any additional commentary or information.
-- Preserve all diacritical marks and nuances of the Urdu script.
-- Ensure the transcription is accurate and faithful to the original text.
-- Do not translate the text; keep it in Urdu.
+- Preserve all diacritical marks and nuances of the script.
+- Do not translate the text.
 """
 
 # Function to load an image and encode it in Base64
@@ -56,7 +56,7 @@ def load_and_encode_image(image_path):
 # Function to send the image to GPT-4V and get the OCR result
 def perform_ocr(encoded_image, system_prompt):
     """
-    Sends the encoded image to the GPT-4V API and returns the OCR result.
+    Sends the encoded image to the GPT-4o API and returns the OCR result.
 
     Parameters:
         encoded_image (str): Base64-encoded image string.
@@ -71,13 +71,14 @@ def perform_ocr(encoded_image, system_prompt):
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": [
-                {"type": "text", "text": ""},
+                {"type": "text", "text": "Provide the text extracted from the image."},
                 {"type": "image_url", "image_url": {
                     "url": f"data:image/png;base64,{encoded_image}"}
                 }
             ]}
         ],
             temperature=0.0,
+            max_tokens=400
         )
         extracted_text = response.choices[0].message.content
         return extracted_text
@@ -118,11 +119,14 @@ def process_images_and_update_csv(images_folder, csv_file_path, system_prompt):
 
         encoded_img = load_and_encode_image(image_path)
         if encoded_img:
+            # print("here")
             extracted_txt = perform_ocr(encoded_img, system_prompt)
+            # print("here2")
             # extracted_txt = "hi"
             if extracted_txt:
                 # Find the row in the DataFrame where 'image' matches the image name
                 match = df['Image'] == image_name
+                # print("yes")
                 # print(image_name)
                 if match.any():
                     df.loc[match, 'Response'] = extracted_txt
@@ -142,8 +146,8 @@ def process_images_and_update_csv(images_folder, csv_file_path, system_prompt):
     print("All images processed successfully. CSV file updated.")
 
 # Specify the images folder and CSV file path
-images_folder = 'WordCount40-60_Renamed' # 'images_dataset'  # Replace with your images folder path
-csv_file_path = 'inferenced_dataset.csv'  # 'inferenced_set.csv'  # Replace with your CSV file path
+images_folder = 'final_dataset' # 'images_dataset'  # Replace with your images folder path
+csv_file_path = 'english_combined_articles.csv'  # 'inferenced_set.csv'  # Replace with your CSV file path
 
 # Start processing
 process_images_and_update_csv(images_folder, csv_file_path, system_prompt)
